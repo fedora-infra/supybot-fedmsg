@@ -69,7 +69,7 @@ class Injector(threading.Thread):
         }
         for target_method, topic in tap_points.items():
 
-            def wrapper_factory():
+            def wrapper_factory(topic):
                 old_method = getattr(target_cls, target_method).__func__
 
                 def wrapper(self, *args, **kw):
@@ -97,7 +97,7 @@ class Injector(threading.Thread):
                 return wrapper
 
             # Build the new method and attach it to the target class.
-            new_method = wrapper_factory()
+            new_method = wrapper_factory(topic=topic)
             setattr(target_cls, target_method, new_method)
 
     def _duckpunch_announce(shmelf):
