@@ -64,8 +64,8 @@ class Injector(threading.Thread):
             )
 
         tap_points = {
-            'do_startmeeting': 'startmeeting',
-            'do_endmeeting': 'endmeeting',
+            'do_startmeeting': 'meeting.start',
+            'do_endmeeting': 'meeting.complete',
         }
         for target_method, topic in tap_points.items():
 
