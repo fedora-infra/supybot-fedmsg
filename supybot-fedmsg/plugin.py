@@ -3,7 +3,6 @@
 :Author: Ralph Bean <rbean@redhat.com>
 """
 
-import datetime
 import fedmsg
 import socket
 import supybot.callbacks
@@ -78,16 +77,20 @@ class Injector(threading.Thread):
                     # result.
                     result = old_method(self, *args, **kw)
 
-                    # Convert time.struct_time to a datetime object.
-                    # fedmsg.encoding can't yet handle struct_time.
-                    kw['time_'] = datetime.datetime(*kw['time_'][:-3])
-
                     # Emit on "org.fedoraproject.prod.meetbot.startmeeting"
                     fedmsg.publish(
                         modname="meetbot",
                         topic=topic,
-                        msg=dict(args=args, kw=kw),
+                        msg=dict(
+                            owner=self.owner,
+                            chairs=self.chairs,
+                            attendees=self.attendees,
+                            url=self.config.filename(url=True),
+                            meeting_topic=self._meetingTopic,
+                            channel=self.channel,
+                        ),
                     )
+
                     # Return the original result from the target plugin.
                     return result
 
