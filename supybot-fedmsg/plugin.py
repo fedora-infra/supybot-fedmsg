@@ -77,7 +77,7 @@ class Injector(threading.Thread):
                     # result.
                     result = old_method(self, *args, **kw)
 
-                    # Emit on "org.fedoraproject.prod.meetbot.startmeeting"
+                    # Emit on "org.fedoraproject.prod.meetbot.meeting.start"
                     fedmsg.publish(
                         modname="meetbot",
                         topic=topic,
