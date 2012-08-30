@@ -66,6 +66,7 @@ class Injector(threading.Thread):
         tap_points = {
             'do_startmeeting': 'meeting.start',
             'do_endmeeting': 'meeting.complete',
+            'do_topic': 'meeting.topic.update',
         }
         for target_method, topic in tap_points.items():
 
@@ -87,6 +88,7 @@ class Injector(threading.Thread):
                             attendees=self.attendees,
                             url=self.config.filename(url=True),
                             meeting_topic=self._meetingTopic,
+                            topic=self.currenttopic,
                             channel=self.channel,
                         ),
                     )
