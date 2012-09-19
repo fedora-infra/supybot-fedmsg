@@ -24,8 +24,13 @@ class Fedmsg(supybot.callbacks.Plugin):
     def __init__(self, irc):
         super(Fedmsg, self).__init__(irc)
 
-        # Initialize fedmsg resources.
-        fedmsg.init(name="supybot." + socket.gethostname())
+        # If fedmsg was already initialized, let's not re-do that.
+        if getattr(fedmsg.__local, '__context', None):
+            print "Not reinitializing fedmsg."
+        else:
+            # Initialize fedmsg resources.
+            hostname = socket.gethostname().split('.', 1)[0]
+            fedmsg.init(name="supybot." + hostname)
 
         # Launch in a thread to duckpunch *after* the other plugins
         # have been setup.
