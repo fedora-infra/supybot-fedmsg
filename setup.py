@@ -15,7 +15,7 @@ f.close()
 
 setup(
     name='supybot-fedmsg',
-    version='0.0.5',
+    version='0.0.6',
     description="Supybot plugin for emitting events to the Fedora message bus",
     long_description=long_description,
     author='Ralph Bean',
