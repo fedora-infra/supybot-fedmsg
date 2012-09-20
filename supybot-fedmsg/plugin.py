@@ -25,7 +25,7 @@ class Fedmsg(supybot.callbacks.Plugin):
         super(Fedmsg, self).__init__(irc)
 
         # If fedmsg was already initialized, let's not re-do that.
-        if getattr(fedmsg.__local, '__context', None):
+        if getattr(getattr(fedmsg, '__local', None), '__context', None):
             print "Not reinitializing fedmsg."
         else:
             # Initialize fedmsg resources.
