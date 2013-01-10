@@ -8,7 +8,6 @@ import socket
 import supybot.callbacks
 import threading
 import time
-import types
 
 
 class Fedmsg(supybot.callbacks.Plugin):
