@@ -9,6 +9,9 @@ import supybot.callbacks
 import threading
 import time
 
+# A flag placed on wrapped methods to note we have already wrapped them once.
+SENTINEL = '_sentinel_flag'
+
 
 class Fedmsg(supybot.callbacks.Plugin):
     """ Use this plugin to fedmsg-enable various other supybot plugins.
@@ -53,6 +56,11 @@ class Injector(threading.Thread):
 
         # TODO -- _duckpunch_announce()
 
+    @classmethod
+    def already_wrapped(cls, method):
+        """ Return true if it looks like we have already wrapped a target. """
+        return hasattr(method, SENTINEL) or hasattr(method.__func__, SENTINEL)
+
     def _duckpunch_meetbot(shmelf):
         """ Replace some of meetbot's methods with our own which simply call
         meetbot's original method, and then emit a fedmsg message before
@@ -75,12 +83,12 @@ class Injector(threading.Thread):
         for target_method, topic in tap_points.items():
 
             def wrapper_factory(topic):
-                old_method = getattr(target_cls, target_method).__func__
+                old_method = getattr(target_cls, target_method)
 
                 def wrapper(self, *args, **kw):
                     # Call the target plugin's original code first and save the
                     # result.
-                    result = old_method(self, *args, **kw)
+                    result = old_method.__func__(self, *args, **kw)
 
                     # Emit on "org.fedoraproject.prod.meetbot.meeting.start"
                     fedmsg.publish(
@@ -100,7 +108,13 @@ class Injector(threading.Thread):
                     # Return the original result from the target plugin.
                     return result
 
-                return wrapper
+                # Set a flag indicating that we are wrapping the other plugin
+                setattr(wrapper, SENTINEL, True)
+
+                if already_wrapped(old_method):
+                    return old_method
+                else:
+                    return wrapper
 
             # Build the new method and attach it to the target class.
             new_method = wrapper_factory(topic=topic)
