@@ -13,6 +13,11 @@ import time
 SENTINEL = '_sentinel_flag'
 
 
+def already_wrapped(method):
+    """ Return true if it looks like we have already wrapped a target. """
+    return hasattr(method, SENTINEL) or hasattr(method.__func__, SENTINEL)
+
+
 class Fedmsg(supybot.callbacks.Plugin):
     """ Use this plugin to fedmsg-enable various other supybot plugins.
 
@@ -56,10 +61,6 @@ class Injector(threading.Thread):
 
         # TODO -- _duckpunch_announce()
 
-    @classmethod
-    def already_wrapped(cls, method):
-        """ Return true if it looks like we have already wrapped a target. """
-        return hasattr(method, SENTINEL) or hasattr(method.__func__, SENTINEL)
 
     def _duckpunch_meetbot(shmelf):
         """ Replace some of meetbot's methods with our own which simply call
