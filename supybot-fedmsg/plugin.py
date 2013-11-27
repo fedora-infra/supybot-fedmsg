@@ -94,7 +94,7 @@ class Injector(threading.Thread):
                     # Include the owner of the meeting in the chairs dict just
                     # in case they never explicitly #chair'd themselves.
                     chairs = self.chairs
-                    chairs[owner] = chairs.get(owner, True)
+                    chairs[self.owner] = chairs.get(self.owner, True)
 
                     # Emit on "org.fedoraproject.prod.meetbot.meeting.start"
                     fedmsg.publish(
