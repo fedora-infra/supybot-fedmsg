@@ -119,6 +119,7 @@ class Injector(threading.Thread):
                             meeting_topic=self._meetingTopic,
                             topic=self.currenttopic,
                             channel=self.channel,
+                            details=kw,  # This includes the 'who' and 'what'
                         ),
                     )
 
