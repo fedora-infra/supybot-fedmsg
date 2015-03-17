@@ -80,6 +80,17 @@ class Injector(threading.Thread):
             'do_startmeeting': 'meeting.start',
             'do_endmeeting': 'meeting.complete',
             'do_topic': 'meeting.topic.update',
+
+            'do_agreed':    'meeting.item.agreed',
+            'do_accepted':  'meeting.item.accepted',
+            'do_rejected':  'meeting.item.rejected',
+
+            'do_action':    'meeting.item.action',
+            'do_info':      'meeting.item.info',
+            'do_idea':      'meeting.item.idea',
+            'do_help':      'meeting.item.help',  # We map #help and #halp
+            'do_halp':      'meeting.item.help',  # to the same topic...
+            'do_link':      'meeting.item.link',
         }
         for target_method, topic in tap_points.items():
 
