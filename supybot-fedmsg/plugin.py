@@ -80,6 +80,17 @@ class Injector(threading.Thread):
             'do_startmeeting': 'meeting.start',
             'do_endmeeting': 'meeting.complete',
             'do_topic': 'meeting.topic.update',
+
+            'do_agreed':    'meeting.item.agreed',
+            'do_accepted':  'meeting.item.accepted',
+            'do_rejected':  'meeting.item.rejected',
+
+            'do_action':    'meeting.item.action',
+            'do_info':      'meeting.item.info',
+            'do_idea':      'meeting.item.idea',
+            'do_help':      'meeting.item.help',  # We map #help and #halp
+            'do_halp':      'meeting.item.help',  # to the same topic...
+            'do_link':      'meeting.item.link',
         }
         for target_method, topic in tap_points.items():
 
@@ -94,7 +105,7 @@ class Injector(threading.Thread):
                     # Include the owner of the meeting in the chairs dict just
                     # in case they never explicitly #chair'd themselves.
                     chairs = self.chairs
-                    chairs[owner] = chairs.get(owner, True)
+                    chairs[self.owner] = chairs.get(self.owner, True)
 
                     # Emit on "org.fedoraproject.prod.meetbot.meeting.start"
                     fedmsg.publish(
@@ -108,6 +119,7 @@ class Injector(threading.Thread):
                             meeting_topic=self._meetingTopic,
                             topic=self.currenttopic,
                             channel=self.channel,
+                            details=kw,  # This includes the 'who' and 'what'
                         ),
                     )
 
