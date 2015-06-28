@@ -12,6 +12,10 @@ import time
 # A flag placed on wrapped methods to note we have already wrapped them once.
 SENTINEL = '_sentinel_flag'
 
+# When we start up, we try to wrap meetbot.  But if it's not there, we die and
+# create a new thread that wakes up in 60s and tries again.
+INTERVAL = 60
+
 
 def already_wrapped(method):
     """ Return true if it looks like we have already wrapped a target. """
@@ -40,7 +44,7 @@ class Fedmsg(supybot.callbacks.Plugin):
             fedmsg.init(name="supybot." + hostname)
 
         # Launch in a thread to duckpunch *after* the other plugins
-        # have been setup.
+        # have been set up.
         thread = Injector()
         thread.start()
 
@@ -52,29 +56,24 @@ class Injector(threading.Thread):
     before we try.
     """
 
-    def run(self):
-        # Sleep 2 seconds
-        time.sleep(2)
-
-        # Then, do our thing.
-        self._duckpunch_meetbot()
-
-        # TODO -- _duckpunch_announce()
-
-
-    def _duckpunch_meetbot(shmelf):
+    def run(shmelf):
         """ Replace some of meetbot's methods with our own which simply call
         meetbot's original method, and then emit a fedmsg message before
         returning.
         """
 
+        time.sleep(INTERVAL)
+
         try:
             import sys
             target_cls = sys.modules['MeetBot.meeting'].Meeting
         except KeyError:
-            raise ValueError(
-                "MeetBot not yet enabled.  Try Fedmsg again later."
-            )
+            # Start another thread to finish our work later.
+            another_thread = Injector()
+            another_thread.start()
+            print "MeetBot not yet enabled."
+            print "  Will try to wrap fedmsg again in %is" % INTERVAL
+            return  # Bail out early.
 
         tap_points = {
             'do_startmeeting': 'meeting.start',
@@ -137,10 +136,6 @@ class Injector(threading.Thread):
             # Build the new method and attach it to the target class.
             new_method = wrapper_factory(topic=topic)
             setattr(target_cls, target_method, new_method)
-
-    def _duckpunch_announce(shmelf):
-        """ Instrument the announce plugin to emit messages. """
-        raise NotImplementedError
 
 
 Class = Fedmsg
