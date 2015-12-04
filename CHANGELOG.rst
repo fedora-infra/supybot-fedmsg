@@ -1,3 +1,16 @@
+
+0.2.0
+-----
+
+Pull Requests
+
+- (@ralphbean)      #10, Try again later when we're unable to wrap meetbot.
+  https://github.com/fedora-infra/supybot-fedmsg/pull/10
+
+Commits
+
+- e0d52bc23 Try again later when we're unable to wrap meetbot.
+  https://github.com/fedora-infra/supybot-fedmsg/commit/e0d52bc23
 Changelog
 =========
 
