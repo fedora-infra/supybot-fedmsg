@@ -65,8 +65,8 @@ class Injector(threading.Thread):
             # Start another thread to finish our work later.
             another_thread = Injector()
             another_thread.start()
-            print "MeetBot not yet enabled."
-            print "  Will try to wrap fedmsg again in %is" % INTERVAL
+            print("MeetBot not yet enabled.")
+            print("  Will try to wrap fedmsg again in %is" % INTERVAL)
             return  # Bail out early.
 
         tap_points = {
@@ -117,9 +117,9 @@ class Injector(threading.Thread):
                         )
                         publish(msg)
                     except PublishReturned as e:
-                        print "Fedora Messaging broker rejected message {}: {}".format(msg.id, e)
+                        print("Fedora Messaging broker rejected message {}: {}".format(msg.id, e))
                     except ConnectionException as e:
-                        print "Error sending message {}: {}".format(msg.id, e)
+                        print("Error sending message {}: {}".format(msg.id, e))
 
                     # Return the original result from the target plugin.
                     return result

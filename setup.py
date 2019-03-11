@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
-
 import sys
+from setuptools import setup
 
 f = open('README.rst')
 long_description = f.read().strip()
@@ -29,6 +23,8 @@ setup(
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
     ],
     packages=['supybot-fedmsg'],
     include_package_data=True,
