@@ -1,13 +1,15 @@
-""" supybot-fedmsg - augment other supybot plugins to emit fedmsg messages.
+""" supybot-fedmsg - augment other supybot plugins to emit fedora-messaging messages.
 
 :Author: Ralph Bean <rbean@redhat.com>
 """
 
-import fedmsg
 import socket
 import supybot.callbacks
 import threading
 import time
+
+from fedora_messaging.api import publish, Message
+from fedora_messaging.exceptions import PublishReturned, ConnectionException
 
 # A flag placed on wrapped methods to note we have already wrapped them once.
 SENTINEL = '_sentinel_flag'
@@ -34,14 +36,6 @@ class Fedmsg(supybot.callbacks.Plugin):
 
     def __init__(self, irc):
         super(Fedmsg, self).__init__(irc)
-
-        # If fedmsg was already initialized, let's not re-do that.
-        if getattr(getattr(fedmsg, '__local', None), '__context', None):
-            print "Not reinitializing fedmsg."
-        else:
-            # Initialize fedmsg resources.
-            hostname = socket.gethostname().split('.', 1)[0]
-            fedmsg.init(name="supybot." + hostname)
 
         # Launch in a thread to duckpunch *after* the other plugins
         # have been set up.
@@ -106,21 +100,26 @@ class Injector(threading.Thread):
                     chairs = self.chairs
                     chairs[self.owner] = chairs.get(self.owner, True)
 
-                    # Emit on "org.fedoraproject.prod.meetbot.meeting.start"
-                    fedmsg.publish(
-                        modname="meetbot",
-                        topic=topic,
-                        msg=dict(
-                            owner=self.owner,
-                            chairs=chairs,
-                            attendees=self.attendees,
-                            url=self.config.filename(url=True),
-                            meeting_topic=self._meetingTopic,
-                            topic=self.currenttopic,
-                            channel=self.channel,
-                            details=kw,  # This includes the 'who' and 'what'
-                        ),
+                    payload = dict(
+                        owner=self.owner,
+                        chairs=chairs,
+                        attendees=self.attendees,
+                        url=self.config.filename(url=True),
+                        meeting_topic=self._meetingTopic,
+                        topic=self.currenttopic,
+                        channel=self.channel,
+                        details=kw,  # This includes the 'who' and 'what'
                     )
+                    try:
+                        msg = Message(
+                            topic="meetbot.{}.v1".format(topic),
+                            body=payload,
+                        )
+                        publish(msg)
+                    except PublishReturned as e:
+                        print "Fedora Messaging broker rejected message {}: {}".format(msg.id, e)
+                    except ConnectionException as e:
+                        print "Error sending message {}: {}".format(msg.id, e)
 
                     # Return the original result from the target plugin.
                     return result

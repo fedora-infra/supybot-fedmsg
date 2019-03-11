@@ -6,6 +6,8 @@ Pull Requests
 
 - (@ralphbean)      #10, Try again later when we're unable to wrap meetbot.
   https://github.com/fedora-infra/supybot-fedmsg/pull/10
+- (@abompard)       #12, Migrate to Fedora Messaging.
+  https://github.com/fedora-infra/supybot-fedmsg/pull/12
 
 Commits
 
